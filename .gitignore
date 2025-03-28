@@ -48,5 +48,5 @@ po/*~
 # RStudio Connect folder
 rsconnect/
 
-ignoring cougar camera videos
+#ignoring cougar camera videos
 /data/cam_trap_cougar
