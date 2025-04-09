@@ -11,7 +11,7 @@
   # Reading, Compiling, and organizing raw data ---------------------------------
   #reading in data
   new_data <- read.csv("data/new_scavenger_count.csv")
-  wilmers_data <- as.data.frame(read_xlsx("data/_wilmers_scavenger_count.xlsx"))
+  wilmers_data <- as.data.frame(read_xlsx("data/wilmers_scavenger_count.xlsx"))
   
   
   #restricting new_data to definite, probable wolf kills and fresh scavenges
@@ -37,14 +37,12 @@
   
   
   #restricting wilmers_data to 
-  #' wolf kills and fresh scavenges
-  #' those observed from before stage 2.5
-  wilmers_carcmeta <- read_xlsx("Wilmers_ObsSets.xlsx")
+  #' wolf kills
+  wilmers_carcmeta <- read_xlsx("wilmers_carcass_site_data.xlsx")
   
   wilmers_carcmeta <- merge(wilmers_carcmeta, carcass_meta, by.x = 6, by.y = 1)
   wilmers_carcmeta <- wilmers_carcmeta[wilmers_carcmeta$KILL.TYPE %in% c("WOLF KILL", "SCAVENGE FRESH CARCASS") |
                                          wilmers_carcmeta$COD %in% c("DEFINITE WOLF", "PROBABLE WOLF"),]
-  wilmers_carcmeta <- wilmers_carcmeta[wilmers_carcmeta$`starting point` <= 2.5,]
   wilmers_carcmeta <- wilmers_carcmeta[wilmers_carcmeta$`Mortality Number` != "00-200" &
                                          wilmers_carcmeta$`Mortality Number` != "00-126" &
                                          wilmers_carcmeta$`Mortality Number` != "00-203",]
@@ -107,15 +105,15 @@
   
   
   # [ALTERNATIVE] Reading in and organizing ONLY new_data -------------------
-  data <- read.csv("All Obs.csv")
+  data <- read.csv("data/new_scavenger_count.csv")
   data <- data[year(mdy(data$Date)) >= 2021,]
   
   
   #merging new_data with meta data to add
   #' date of death
   #' prey species and age
-  new_carcmeta <- read_xlsx("Initial Site Info.xlsx")
-  data <- merge(data, new_carcmeta[,c(1,8:10)], by.x = 2, by.y = 1)
+  carcass_meta <- read.csv("data/wolf_project_carcass_data.csv", header = T)
+  data <- merge(data, carcass_meta[,c(1,8:10)], by.x = 2, by.y = 1)
   
   
   #removing cougar kills and late scavenges
