@@ -62,8 +62,7 @@ data$delta_dod <- as.numeric(data$date - data$dod)
     #and creating new dataframe with new combined counts
     dattime$count <- unlist(lapply(dattime_list, function(x){sum(x$number_of_animals)}))
     
-    
-    #finding the delta_dod with the highest count for each carcass
+    #finding the high count for each day (delta_dod)
     mort <- unique(dattime$kill_num)
     mort_list <- vector("list", length = length(mort))
     
@@ -75,18 +74,19 @@ data$delta_dod <- as.numeric(data$date - data$dod)
     #calculating the max count for each time step
     #if multiple observations in a day have the same max count, only taking one of them
     mort_df <- do.call(rbind, lapply(mort_list, 
-                                     function(x){if(length(unique(x$delta_dod)) == 1){
-                                       x[x$count == max(x$count),][1,]
-                                     }else{
-                                       tmp_max <- max(x$count)
-                                       tmp_x_df <- data.frame()
+                                     function(x){
+                                       ddd <- unique(x$delta_dod)
                                        
-                                       for(x_day in unique(x$delta_dod)){
-                                         tmp_x <- x[x$delta_dod == x_day,]
-                                         if(tmp_max %in% tmp_x$count){tmp_x_df <- rbind(tmp_x_df, tmp_x[tmp_x$count == tmp_max,][1,])}
+                                       ddd_high <- slice(x, 0)
+                                       
+                                       for(i in 1:length(ddd)){
+                                         ddd_high <- filter(x, delta_dod == ddd[i]) %>% 
+                                           filter(count == max(count)) %>% 
+                                           slice(1) %>% 
+                                           bind_rows(ddd_high)
+                                         
                                        }
-                                       return(tmp_x_df)
-                                     }
+                                       return(ddd_high)
                                      }))
     
     
