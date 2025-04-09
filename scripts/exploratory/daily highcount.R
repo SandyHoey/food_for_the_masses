@@ -1,3 +1,5 @@
+#creating daily high counts from the wolf/cougar kill observations 
+
 library(janitor)
 
 
