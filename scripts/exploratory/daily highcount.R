@@ -3,7 +3,7 @@ library(readxl)
 
 
 # Reading in data and organizing columns ----------------------------------
-data <- clean_names(read.csv("data/new_scavenger_count.csv"))
+data <- clean_names(read_csv("data/new_scavenger_count.csv"))
 data$date <- mdy(data$date)
 data <- data[year(data$date) >= 2021,]
 
@@ -11,7 +11,7 @@ data <- data[year(data$date) >= 2021,]
 #merging new_data with meta data to add
 #' date of death
 #' prey species, sex, age
-carcass_meta <- clean_names(read.csv("data/wolf_project_carcass_data.csv", header = T))
+carcass_meta <- clean_names(read_csv("data/wolf_project_carcass_data.csv", header = T))
 data <- merge(data, carcass_meta[,c("kill", "dod", 
                                     "species", "sex", 
                                     "age_class",
@@ -70,25 +70,56 @@ data$delta_dod <- as.numeric(data$date - data$dod)
       mort_list[[i]] <- dattime[dattime$kill_num == mort[i],]
     }
     
-    
+    #WORKS, BUT BUGGY SINCE IF A SPECIES ISNT PRESENT ON A DAY IT DOESNT PULL A ZERO
     #calculating the max count for each time step
     #if multiple observations in a day have the same max count, only taking one of them
-    mort_df <- do.call(rbind, lapply(mort_list, 
-                                     function(x){
-                                       ddd <- unique(x$delta_dod)
-                                       
-                                       ddd_high <- slice(x, 0)
-                                       
-                                       for(i in 1:length(ddd)){
-                                         ddd_high <- filter(x, delta_dod == ddd[i]) %>% 
-                                           filter(count == max(count)) %>% 
-                                           slice(1) %>% 
-                                           bind_rows(ddd_high)
-                                         
-                                       }
-                                       return(ddd_high)
-                                     }))
+    mort_list_max <- lapply(mort_list, function(x) {
+      ddd <- unique(x$delta_dod)
+      
+      ddd_high <- slice(x, 0)
+      
+      for (i in 1:length(ddd)) {
+        ddd_high <- filter(x, delta_dod == ddd[i]) %>%
+          filter(count == max(count)) %>%
+          slice(1) %>%
+          bind_rows(ddd_high)
+        
+      }
+      return(ddd_high)
+    })
     
+    
+    #fixing bug where days observed, but without a count for a species doesn't pull a zero
+      #because there is no associated data point
+    
+    obs_period <- data %>% 
+      group_by(kill_num) %>% 
+      dplyr::summarize(min = min(date), max = max(date))
+    
+    mort_df <- do.call("rbind", lapply(mort_list_max, function(x) {
+      obs_dates <- obs_period %>% 
+        filter(kill_num == unique(x$kill_num))
+      obs_dates <- seq(obs_dates$min, obs_dates$max, 'days')
+      
+      if(length(obs_dates) != nrow(x)){
+        missing <- obs_dates[-which(obs_dates %in% x$date)]
+        for(i in 1:length(missing)){
+          x <- rbind(x, data.frame(
+                          kill_num = x[1,]$kill_num,
+                          date = missing[i],
+                          time = NA,
+                          number_of_animals = 0,
+                          dod = x[1,]$dod,
+                          species = x[1,]$species,
+                          sex = x[1,]$sex,
+                          age_class = x[1,]$age_class,
+                          cougar_kill = x[1,]$cougar_kill,
+                          delta_dod = missing[i] - x[1,]$dod,
+                          count = 0))
+        }
+      }
+      return(x)
+    }))
     
     return(mort_df)
   }
