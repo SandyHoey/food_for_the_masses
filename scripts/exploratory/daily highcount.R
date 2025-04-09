@@ -2,8 +2,9 @@ library(janitor)
 library(readxl)
 
 
+
 # Reading in data and organizing columns ----------------------------------
-data <- clean_names(read_csv("data/new_scavenger_count.csv"))
+data <- clean_names(read.csv("data/new_scavenger_count.csv"))
 data$date <- mdy(data$date)
 data <- data[year(data$date) >= 2021,]
 
@@ -11,7 +12,7 @@ data <- data[year(data$date) >= 2021,]
 #merging new_data with meta data to add
 #' date of death
 #' prey species, sex, age
-carcass_meta <- clean_names(read_csv("data/wolf_project_carcass_data.csv", header = T))
+carcass_meta <- clean_names(read.csv("data/wolf_project_carcass_data.csv"))
 data <- merge(data, carcass_meta[,c("kill", "dod", 
                                     "species", "sex", 
                                     "age_class",
@@ -26,7 +27,7 @@ data <- data[-which(data$kill %in% c("22-113", "21-181", "21-198")),]
 
 #reducing columns and fixing column name
 data <- data[,c(1,3:7,19:23)]
-colnames(data)[1] <- "kill_num"
+colnames(data)[c(1,11)] <- c("kill_num", "cougar_kill")
 
 #removing FOV from count
 ## ONLY DO IF COMPARING TO CAMERAS
@@ -70,7 +71,6 @@ data$delta_dod <- as.numeric(data$date - data$dod)
       mort_list[[i]] <- dattime[dattime$kill_num == mort[i],]
     }
     
-    #WORKS, BUT BUGGY SINCE IF A SPECIES ISNT PRESENT ON A DAY IT DOESNT PULL A ZERO
     #calculating the max count for each time step
     #if multiple observations in a day have the same max count, only taking one of them
     mort_list_max <- lapply(mort_list, function(x) {
@@ -98,7 +98,7 @@ data$delta_dod <- as.numeric(data$date - data$dod)
     
     mort_df <- do.call("rbind", lapply(mort_list_max, function(x) {
       obs_dates <- obs_period %>% 
-        filter(kill_num == unique(x$kill_num))
+        filter(kill_num == x[1,"kill_num"])
       obs_dates <- seq(obs_dates$min, obs_dates$max, 'days')
       
       if(length(obs_dates) != nrow(x)){
@@ -130,6 +130,8 @@ data$delta_dod <- as.numeric(data$date - data$dod)
       #' prey species & age
       #' delta_dod
       #' count
+    wolf_data <- raw_to_model(data, "WOLF")
+    wolf_dattime <- unique(data[data$species_id == "WOLF" & data$delta_dod %in% unique(wolf_data$delta_dod), c(1,5,7:9)])
     raven_data <- raw_to_model(data, "RAVEN")
     raven_dattime <- unique(data[data$species_id == "RAVEN" & data$delta_dod %in% unique(raven_data$delta_dod), c(1,5,7:9)])
     magpie_data <- raw_to_model(data, "MAGPIE")
