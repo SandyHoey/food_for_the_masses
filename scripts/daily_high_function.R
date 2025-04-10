@@ -1,4 +1,10 @@
-daily_high_count <- function(data){
+daily_high_count <- function(data, cam = F){
+  #only using relevant columns 
+  data <- data %>% 
+    select("kill_num", "date", "time", "count", 
+           "dod", "delta_dod", "species", "sex", 
+           "age_class", "cougar_kill")
+    
   ## separating into a list by kill number
   mort <- unique(data$kill_num)
   mort_list <- vector("list", length = length(mort))
@@ -28,34 +34,39 @@ daily_high_count <- function(data){
   #fixing bug where days observed, but without a count for a species doesn't pull a zero
   #because there is no associated data point
   
-  obs_period <- data %>% 
-    group_by(kill_num) %>% 
-    dplyr::summarize(min = min(date), max = max(date))
-  
-  mort_df <- do.call("rbind", lapply(mort_list_max, function(x) {
-    obs_dates <- obs_period %>% 
-      filter(kill_num == x[1,"kill_num"])
-    obs_dates <- seq(obs_dates$min, obs_dates$max, 'days')
+  if(cam == F){
+    obs_period <- data %>% 
+      group_by(kill_num) %>% 
+      dplyr::summarize(min = min(date), max = max(date))
     
-    if(length(obs_dates) != nrow(x)){
-      missing <- obs_dates[-which(obs_dates %in% x$date)]
-      for(i in 1:length(missing)){
-        x <- rbind(x, data.frame(
-          kill_num = x[1,]$kill_num,
-          date = missing[i],
-          time = NA,
-          number_of_animals = 0,
-          dod = x[1,]$dod,
-          species = x[1,]$species,
-          sex = x[1,]$sex,
-          age_class = x[1,]$age_class,
-          cougar_kill = x[1,]$cougar_kill,
-          delta_dod = missing[i] - x[1,]$dod,
-          count = 0))
+    mort_df <- do.call("rbind", lapply(mort_list_max, function(x) {
+      obs_dates <- obs_period %>% 
+        filter(kill_num == as.character(x[1,"kill_num"]))
+      obs_dates <- seq(obs_dates$min, obs_dates$max, 'days')
+      
+      if(length(obs_dates) != nrow(x)){
+        missing <- obs_dates[-which(obs_dates %in% x$date)]
+        for(i in 1:length(missing)){
+          x <- rbind(x, 
+                     data.frame(
+                       kill_num = x[1,]$kill_num,
+                       date = missing[i],
+                       time = NA,
+                       count = 0,
+                       dod = x[1,]$dod,
+                       delta_dod = missing[i] - x[1,]$dod,
+                       species = x[1,]$species,
+                       sex = x[1,]$sex,
+                       age_class = x[1,]$age_class,
+                       cougar_kill = x[1,]$cougar_kill
+                     )
+            )
+          }
+        }
+        return(x)
       }
-    }
-    return(x)
-  }))
+    ))
+  }else(mort_df <- do.call("rbind", mort_list_max))
   
   return(mort_df)
 }
