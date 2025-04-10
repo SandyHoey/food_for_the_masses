@@ -33,6 +33,11 @@ cam_data <- merge(cam_data, carcass_meta[,c("kill", "dod",
                                     "age_class",
                                     "cougar_kill")], 
               by.x = 13, by.y = 1)
+
+
+#transforming cougar_kill column into binary
+cam_data <- cam_data %>% 
+  mutate(cougar_kill = cougar_kill == "XXX")
               
 
 #removing rows for deployment and retrieval of camera
