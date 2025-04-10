@@ -1,6 +1,8 @@
 #creating daily high counts from the wolf/cougar kill observations 
 
 library(janitor)
+library(lubridate)
+library(dplyr)
 
 
 
@@ -28,7 +30,7 @@ data <- data[-which(data$kill %in% c("22-113", "21-181", "21-198")),]
 
 #reducing columns and fixing column name
 data <- data[,c(1,3:7,19:23)]
-colnames(data)[c(1,11)] <- c("kill_num", "cougar_kill")
+colnames(data)[c(1,5,11)] <- c("kill_num", "scav_species", "cougar_kill")
 
 #removing FOV from count
 ## ONLY DO IF COMPARING TO CAMERAS
@@ -45,7 +47,7 @@ data$delta_dod <- as.numeric(data$date - data$dod)
   
   raw_to_model <- function(data, species){
     #subsetting to desired species
-    tmp_data <- data[data$species_id == species,]
+    tmp_data <- data[data$scav_species == species,]
     
     #creating a variable length list to put unique date/time combinations into
     dattime <- unique(tmp_data[,-c(4,5)])
@@ -132,17 +134,17 @@ data$delta_dod <- as.numeric(data$date - data$dod)
       #' delta_dod
       #' count
     wolf_data <- raw_to_model(data, "WOLF")
-    wolf_dattime <- unique(data[data$species_id == "WOLF" & data$delta_dod %in% unique(wolf_data$delta_dod), c(1,5,7:9)])
+    wolf_dattime <- unique(data[data$scav_species == "WOLF" & data$delta_dod %in% unique(wolf_data$delta_dod), c(1,5,7:9)])
     raven_data <- raw_to_model(data, "RAVEN")
-    raven_dattime <- unique(data[data$species_id == "RAVEN" & data$delta_dod %in% unique(raven_data$delta_dod), c(1,5,7:9)])
+    raven_dattime <- unique(data[data$scav_species == "RAVEN" & data$delta_dod %in% unique(raven_data$delta_dod), c(1,5,7:9)])
     magpie_data <- raw_to_model(data, "MAGPIE")
-    magpie_dattime <- unique(data[data$species_id == "MAGPIE" & data$delta_dod %in% unique(magpie_data$delta_dod),c(1,5,7:9)])
+    magpie_dattime <- unique(data[data$scav_species == "MAGPIE" & data$delta_dod %in% unique(magpie_data$delta_dod),c(1,5,7:9)])
     coyote_data <- raw_to_model(data, "COYOTE")
-    coyote_dattime <- unique(data[data$species_id == "COYOTE" & data$delta_dod %in% unique(coyote_data$delta_dod),c(1,5,7:9)])
+    coyote_dattime <- unique(data[data$scav_species == "COYOTE" & data$delta_dod %in% unique(coyote_data$delta_dod),c(1,5,7:9)])
     baea_data <- raw_to_model(data, "BALD EAGLE")
-    baea_dattime <- unique(data[data$species_id == "BALD EAGLE" & data$delta_dod %in% unique(baea_data$delta_dod),c(1,5,7:9)])
+    baea_dattime <- unique(data[data$scav_species == "BALD EAGLE" & data$delta_dod %in% unique(baea_data$delta_dod),c(1,5,7:9)])
     goea_data <- raw_to_model(data, "GOLDEN EAGLE")
-    goea_dattime <- unique(data[data$species_id == "GOLDEN EAGLE" & data$delta_dod %in% unique(goea_data$delta_dod),c(1,5,7:9)])
+    goea_dattime <- unique(data[data$scav_species == "GOLDEN EAGLE" & data$delta_dod %in% unique(goea_data$delta_dod),c(1,5,7:9)])
   
     
 ###23-051 is messed up and not linking to the correct kill
