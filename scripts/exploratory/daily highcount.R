@@ -60,16 +60,10 @@ source("scripts/daily_high_function.R")
       #' delta_dod
       #' count
     wolf_data <- daily_high_count(obs_combine_area(data, "WOLF"))
-    wolf_dattime <- unique(data[data$scav_species == "WOLF" & data$delta_dod %in% unique(wolf_data$delta_dod), c(1,5,7:9)])
     raven_data <- daily_high_count(obs_combine_area(data, "RAVEN"))
-    raven_dattime <- unique(data[data$scav_species == "RAVEN" & data$delta_dod %in% unique(raven_data$delta_dod), c(1,5,7:9)])
     magpie_data <- daily_high_count(obs_combine_area(data, "MAGPIE"))
-    magpie_dattime <- unique(data[data$scav_species == "MAGPIE" & data$delta_dod %in% unique(magpie_data$delta_dod),c(1,5,7:9)])
     coyote_data <- daily_high_count(obs_combine_area(data, "COYOTE"))
-    coyote_dattime <- unique(data[data$scav_species == "COYOTE" & data$delta_dod %in% unique(coyote_data$delta_dod),c(1,5,7:9)])
     baea_data <- daily_high_count(obs_combine_area(data, "BALD EAGLE"))
-    baea_dattime <- unique(data[data$scav_species == "BALD EAGLE" & data$delta_dod %in% unique(baea_data$delta_dod),c(1,5,7:9)])
     goea_data <- daily_high_count(obs_combine_area(data, "GOLDEN EAGLE"))
-    goea_dattime <- unique(data[data$scav_species == "GOLDEN EAGLE" & data$delta_dod %in% unique(goea_data$delta_dod),c(1,5,7:9)])
-  
+
     

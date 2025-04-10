@@ -36,12 +36,13 @@ cam_data <- merge(cam_data, carcass_meta[,c("kill", "dod",
               
 
 #removing rows for deployment and retrieval of camera
-cam_data <- cam_data %>% 
-  filter(!(comment %in% c("setup",
-                        "set up",
-                        "deployment",
-                        "deployement",
-                        "retrieval")))
+# cam_data <- cam_data %>% 
+#   filter(!(comment %in% c("setup",
+#                         "set up",
+#                         "deployment",
+#                         "deployement",
+#                         "retrieval")))
+#NOT removing this so that it shows if the camera was still working when retrieved
 
 
 #creating separate date and time columns
@@ -71,7 +72,22 @@ source("scripts/daily_high_function.R")
 
 wolf_cam_data <- cam_data %>% 
   filter(scav_species == "wolf") %>% 
-  daily_high_count(cam = T)
+  daily_high_count
+raven_cam_data <- cam_data %>% 
+  filter(scav_species == "raven") %>% 
+  daily_high_count
+magpie_cam_data <- cam_data %>% 
+  filter(scav_species == "magpie") %>% 
+  daily_high_count
+coyote_cam_data <- cam_data %>% 
+  filter(scav_species == "coyote") %>% 
+  daily_high_count
+baea_cam_data <- cam_data %>% 
+  filter(scav_species == "bald_eagle") %>% 
+  daily_high_count
+goea_cam_data <- cam_data %>% 
+  filter(scav_species == "golden_eagle") %>% 
+  daily_high_count
 
 #23-005 time is messed up for the photo camera
   #I don't have the files on me (4/10)
