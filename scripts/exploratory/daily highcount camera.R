@@ -12,12 +12,37 @@ cam_data <- list.files("data/cougar_cam_data_files", full.names = TRUE)[grep("cs
   do.call("rbind", .) %>% 
   clean_names
 
-
 #adding a kill number row
 #removing photo info columns
 cam_data <- cam_data %>% 
-  mutate(kill_num = stringr::str_sub(root_folder, 1, 6)) %>% 
+  mutate(kill_num = stringr::str_sub(root_folder, 1, 6)) 
+
+#creating separate date and time columns
+cam_data <- cam_data %>% 
+  mutate(date_time = ymd_hms(date_time)) %>% 
+  mutate(date = as.Date(date_time), time = hms(format(date_time, "%H:%M:%S")))
+
+
+# cleaning weird stuff ----------------------------------------------------
+
+#fixing date issue on 23-005
+#camera 275 (photos) is behind by a year
+correct_date <- cam_data %>% 
+  filter(kill_num == "23-005", photo_camera_id == 275) %>% 
+  select("date") %>% 
+  +365
+
+cam_data[cam_data$kill_num == "23-005" & 
+           cam_data$photo_camera_id == 275,]$date <- correct_date[,1]
+
+
+
+# general data manipulation -----------------------------------------------
+
+#removing unnecessary rows
+cam_data <-cam_data %>% 
   select(-c(1:3,6,7))
+
 
 #subsetting to only daytime photos
 cam_data <- cam_data %>% 
@@ -49,11 +74,6 @@ cam_data <- cam_data %>%
 #                         "retrieval")))
 #NOT removing this so that it shows if the camera was still working when retrieved
 
-
-#creating separate date and time columns
-cam_data <- cam_data %>% 
-  mutate(date_time = ymd_hms(date_time)) %>% 
-  mutate(date = as.Date(date_time), time = hms(format(date_time, "%H:%M:%S")))
 
 #adding column for 'days from DOD' (delta_dod)
 #and removing rows with no DOD
@@ -94,10 +114,6 @@ goea_cam_data <- cam_data %>%
   filter(scav_species == "golden_eagle") %>% 
   daily_high_count
 
-#23-005 time is messed up for the photo camera
-  #I don't have the files on me (4/10)
-  #at least year behind
-  #possible a day as well
 
 #need to be careful with 23-302 since there are also ground observations
   #should be fine because there is no overlap in the deltaDOD between obs and cam
