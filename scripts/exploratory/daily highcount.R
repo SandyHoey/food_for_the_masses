@@ -45,7 +45,7 @@ data$delta_dod <- as.numeric(data$date - data$dod)
 
 ### Getting combined counts between spatial areas during a observation period -----------------------------
   
-  raw_to_model <- function(data, species){
+  obs_to_clean <- function(data, species){
     #subsetting to desired species
     tmp_data <- data[data$scav_species == species,]
     
@@ -62,11 +62,12 @@ data$delta_dod <- as.numeric(data$date - data$dod)
     }
     
     
-    #calculating the total count for each time step
-    #and creating new dataframe with new combined counts
+    #calculating the total count for each datetime
+    #and creating new data frame with new combined area counts
     dattime$count <- unlist(lapply(dattime_list, function(x){sum(x$number_of_animals)}))
     
-    #finding the high count for each day (delta_dod)
+    
+    ## separating into a list by kill number
     mort <- unique(dattime$kill_num)
     mort_list <- vector("list", length = length(mort))
     
@@ -74,7 +75,7 @@ data$delta_dod <- as.numeric(data$date - data$dod)
       mort_list[[i]] <- dattime[dattime$kill_num == mort[i],]
     }
     
-    #calculating the max count for each time step
+    #calculating the max count for each deltadod
     #if multiple observations in a day have the same max count, only taking one of them
     mort_list_max <- lapply(mort_list, function(x) {
       ddd <- unique(x$delta_dod)
@@ -133,17 +134,17 @@ data$delta_dod <- as.numeric(data$date - data$dod)
       #' prey species & age
       #' delta_dod
       #' count
-    wolf_data <- raw_to_model(data, "WOLF")
+    wolf_data <- obs_to_clean(data, "WOLF")
     wolf_dattime <- unique(data[data$scav_species == "WOLF" & data$delta_dod %in% unique(wolf_data$delta_dod), c(1,5,7:9)])
-    raven_data <- raw_to_model(data, "RAVEN")
+    raven_data <- obs_to_clean(data, "RAVEN")
     raven_dattime <- unique(data[data$scav_species == "RAVEN" & data$delta_dod %in% unique(raven_data$delta_dod), c(1,5,7:9)])
-    magpie_data <- raw_to_model(data, "MAGPIE")
+    magpie_data <- obs_to_clean(data, "MAGPIE")
     magpie_dattime <- unique(data[data$scav_species == "MAGPIE" & data$delta_dod %in% unique(magpie_data$delta_dod),c(1,5,7:9)])
-    coyote_data <- raw_to_model(data, "COYOTE")
+    coyote_data <- obs_to_clean(data, "COYOTE")
     coyote_dattime <- unique(data[data$scav_species == "COYOTE" & data$delta_dod %in% unique(coyote_data$delta_dod),c(1,5,7:9)])
-    baea_data <- raw_to_model(data, "BALD EAGLE")
+    baea_data <- obs_to_clean(data, "BALD EAGLE")
     baea_dattime <- unique(data[data$scav_species == "BALD EAGLE" & data$delta_dod %in% unique(baea_data$delta_dod),c(1,5,7:9)])
-    goea_data <- raw_to_model(data, "GOLDEN EAGLE")
+    goea_data <- obs_to_clean(data, "GOLDEN EAGLE")
     goea_dattime <- unique(data[data$scav_species == "GOLDEN EAGLE" & data$delta_dod %in% unique(goea_data$delta_dod),c(1,5,7:9)])
   
     
