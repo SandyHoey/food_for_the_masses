@@ -64,11 +64,11 @@ source("scripts/daily_high_function.R")
       #' prey species & age
       #' delta_dod
       #' count
-    wolf_obs_data <- daily_high_count(obs_combine_area(obs_data, "WOLF"))
-    raven_obs_data <- daily_high_count(obs_combine_area(obs_data, "RAVEN"))
-    magpie_obs_data <- daily_high_count(obs_combine_area(obs_data, "MAGPIE"))
-    coyote_obs_data <- daily_high_count(obs_combine_area(obs_data, "COYOTE"))
-    baea_obs_data <- daily_high_count(obs_combine_area(obs_data, "BALD EAGLE"))
-    goea_obs_data <- daily_high_count(obs_combine_area(obs_data, "GOLDEN EAGLE"))
+    wolf_obs_data <- daily_high_count(obs_combine_area(obs_data, "WOLF"), obs_data)
+    raven_obs_data <- daily_high_count(obs_combine_area(obs_data, "RAVEN"), obs_data)
+    magpie_obs_data <- daily_high_count(obs_combine_area(obs_data, "MAGPIE"), obs_data)
+    coyote_obs_data <- daily_high_count(obs_combine_area(obs_data, "COYOTE"), obs_data)
+    baea_obs_data <- daily_high_count(obs_combine_area(obs_data, "BALD EAGLE"), obs_data)
+    goea_obs_data <- daily_high_count(obs_combine_area(obs_data, "GOLDEN EAGLE"), obs_data)
 
     

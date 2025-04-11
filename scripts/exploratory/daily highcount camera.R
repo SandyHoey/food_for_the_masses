@@ -97,22 +97,22 @@ source("scripts/daily_high_function.R")
 
 wolf_cam_data <- cam_data %>% 
   filter(scav_species == "wolf") %>% 
-  daily_high_count
+  daily_high_count(cam_data)
 raven_cam_data <- cam_data %>% 
   filter(scav_species == "raven") %>% 
-  daily_high_count
+  daily_high_count(cam_data)
 magpie_cam_data <- cam_data %>% 
   filter(scav_species == "magpie") %>% 
-  daily_high_count
+  daily_high_count(cam_data)
 coyote_cam_data <- cam_data %>% 
   filter(scav_species == "coyote") %>% 
-  daily_high_count
+  daily_high_count(cam_data)
 baea_cam_data <- cam_data %>% 
   filter(scav_species == "bald_eagle") %>% 
-  daily_high_count
+  daily_high_count(cam_data)
 goea_cam_data <- cam_data %>% 
   filter(scav_species == "golden_eagle") %>% 
-  daily_high_count
+  daily_high_count(cam_data)
 
 
 #need to be careful with 23-302 since there are also ground observations
